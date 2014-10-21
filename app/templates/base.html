@@ -1,0 +1,19 @@
+<html>
+    <head>
+        <title>Greystash</title>
+    </head>
+    <body>
+        <style>
+            h1  { text-align: center}
+            a {margin: .25em;font-size: 150%}
+            .center {text-align: center; margin-left: auto; margin-right: auto}
+        </style>
+        <h1>GreyStash</h1>
+        <div class="center">
+            <a href="{{url_for('index')}}">Home</a>
+            <a href="{{url_for('index')}}">Get Started</a>
+        </div>
+        <hr> 
+        {% block content %}{% endblock %}
+    </body>
+</html>
