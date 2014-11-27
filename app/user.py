@@ -3,17 +3,15 @@ from random import randint
 from app import db
 
 class User(db.Document):
-    uID = db.StringField("Secret phrase")#hash(User secret phrase)
-    rndSeed = db.StringField("Seed number")#random seed to gnerate passowrds
-    ursSeeds = db.DictField(db.StringField(),"URL salts")#table mapping URL to current salt
+    phoneNumber= db.StringField("User Phone Number")#hash(number)
+    rndSeed = db.IntField()#random seed to gnerate passowrds
+    oneTimeKey = db.IntField()#negative if not active
 
     
-    def updateSalt(current):
-        if current ==sys.maxint:
-            return -sys.maxint
-        return current + 1
-    def getRandomInt():
-        return randint(-(sys.maxint),sys.maxint)
+    @staticmethod
+    def newUser(number):
+        pass
+
     #monditory methods
     def is_authenticated(self):
         return True
@@ -23,8 +21,13 @@ class User(db.Document):
         return False
     def get_id(self):
         try:
-            return unicode(sefl.id)
+            return unicode(self.id)
         except NameError:
             return str(self.id)
     def __repr__(self):
-        return '<User %r seed %r>' % (self.uID,self.rndSeed)
+        return '<User %r seed %r>' % (self.phoneNumber,self.rndSeed)
+def getCode():
+    return randint(10000,999999)
+
+def getRandomSeed():
+    return randint(-system.maxint - 1, sys.maxint)

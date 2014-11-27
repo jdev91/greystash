@@ -14,3 +14,4 @@ lm.init_app(app)
 db = MongoAlchemy(app)
 from views import *
 from user import *
+from crypt import *
