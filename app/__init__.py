@@ -5,7 +5,7 @@ from flask.ext.mongoalchemy import MongoAlchemy
 app = Flask(__name__)
 app.config.update(
     DEBUG = True,
-    MONGOALCHEMY_DATABASE = "Accounts",
+    MONGOALCHEMY_DATABASE = "Users",
     SECRET_KEY = "kjlsfdjlksdfjlksdfjkfsdjlksdfjk"
 )
 
