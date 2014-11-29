@@ -2,8 +2,6 @@ from flask.ext.wtf import Form
 from wtforms import StringField, BooleanField
 
 class LoginForm(Form):
-    uID = StringField("Secret phrase")
-    remberMe = BooleanField("Remember me",default=False)
-    
+    number = StringField("Phone number")
     def validate_on_submit(self):
         return True

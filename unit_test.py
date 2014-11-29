@@ -3,12 +3,12 @@ import string
 import re
 import random
 import time
+from flask import session
 from app import *
 
 class TestApp(unittest.TestCase):
     def setup(self):
-        app.run(debug = True)
-    
+        pass
     def test_crypt_hashVal(self):
         for i in range(10):
             testStr = rndString()
@@ -30,6 +30,16 @@ class TestApp(unittest.TestCase):
         self.assertTrue(user != None)
         user = newUser(curTime)
         self.assertTrue(user == None)
+    def test_views_login(self):
+        with app.test_client() as c:
+            retVal = c.post('/login',data=dict(
+                number="5039271017"
+            ),follow_redirects=True)
+            self.assertTrue(session["USER"] != None)
+            print(str(retVal))
+            retVal = c.post('/logout')
+            print(str(retVal))
+            self.assertTrue(session["USER"] == None)
 def rndString():
     return "".join(random.choice(string.ascii_uppercase + string.digits + string.ascii_lowercase) for i in range(12))
 

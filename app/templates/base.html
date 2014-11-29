@@ -11,10 +11,18 @@
         <h1>GreyStash</h1>
         <div class="center">
             <a href="{{url_for('index')}}">Home</a>
-            <a href="{{url_for('index')}}">Get Started</a>
-            <a href="{{url_for('login')}}">Login/Logout</a>
+            <a href="{{url_for('logout')}}">Logout</a>
+            <a href="{{url_for('login')}}">Login</a>
         </div>
         <hr> 
+        {% with messages = get_flashed_messages()%}
+            {% if messages  %}
+                {% for message in messages  %}
+                    <p class="center">{{message}}</p>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        {% endwith %}
         {% block content %}{% endblock %}
     </body>
 </html>

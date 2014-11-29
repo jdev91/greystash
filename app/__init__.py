@@ -15,3 +15,4 @@ db = MongoAlchemy(app)
 from views import *
 from user import *
 from crypt import *
+from forms import *
