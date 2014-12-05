@@ -6,6 +6,7 @@ import time
 from flask import session
 from app import *
 
+
 class TestApp(unittest.TestCase):
     def setup(self):
         pass
@@ -40,6 +41,9 @@ class TestApp(unittest.TestCase):
             retVal = c.post('/logout')
             print(str(retVal))
             self.assertTrue(session["USER"] == None)
+
+    def test_send_msg(self):
+        sendCode(123456,5039271017)
 def rndString():
     return "".join(random.choice(string.ascii_uppercase + string.digits + string.ascii_lowercase) for i in range(12))
 

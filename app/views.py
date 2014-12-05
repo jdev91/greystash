@@ -1,5 +1,6 @@
 import re
 from app import app
+from sendEmail import sendCode
 from forms import LoginForm
 from crypt import hashVal
 from user import newUser, getUser
@@ -48,3 +49,6 @@ def login():
             note = "New Account created for " + str(phoneNumber) + ".\n" + note
         flash(note)
     return redirect(request.args.get("next") or url_for("index"))
+@app.route("/test",methods=["GET","POST"])
+def test():
+    sendCode(5039271017,123456)
