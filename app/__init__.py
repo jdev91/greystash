@@ -9,8 +9,8 @@ app.config.update(
     MAIL_USE_SSL = False,
     MAIL_USE_TLS = False,
     MAIL_Port = 465,
-    MAIL_USERNAME="greystashthethird@gmail.com",
-    MAIL_PASSWORD="ljmj2310",
+    MAIL_USERNAME="greystash.devlin@gmail.com",
+    MAIL_PASSWORD="stupidpassword",
     DEBUG = True,
     MONGOALCHEMY_DATABASE = "Users",
     SECRET_KEY = "kjlsfdjlksdfjlksdfjkfsdjlksdfjk"

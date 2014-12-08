@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <script>
+        function checkCode(){
+            var val = window.prompt("Phone Code");
+            window.location.href = document.domain + "/genPass.html"
+        }
+    </script>
+document.onload() = checkCode;
+{% endblock %}

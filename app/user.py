@@ -12,6 +12,10 @@ class User(db.Document):
     def __repr__(self):
         return '<User %r seed %r>' % (self.phoneNumber,self.rndSeed)
 
+    def updateCode(self, val):
+        self.OneTimeKey = val
+        self.save()
+
 def getUser(number):
     """ Find user in database
 

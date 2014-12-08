@@ -3,7 +3,7 @@ from app import app
 from sendEmail import sendCode
 from forms import LoginForm
 from crypt import hashVal
-from user import newUser, getUser
+from user import newUser, getUser, getCode
 from flask.ext.login import current_user,login_user,logout_user,login_required
 from flask import render_template, flash, url_for, request, g, redirect, session
 
@@ -49,6 +49,26 @@ def login():
             note = "New Account created for " + str(phoneNumber) + ".\n" + note
         flash(note)
     return redirect(request.args.get("next") or url_for("index"))
+
+@app.route("/genCode",methods=["GET", "POST"])
+def getCode():
+    if not "USER" in session.keys() or session["USER"] == None:
+        return redirect(url_for("login"))
+    
+    #grab user info
+    phoneNumber = session["USER"]
+    hashPhone = hashVal(phoneNumber)
+    user = getUser(phoneNumber) 
+    if user == None:
+        return redirect(url_for("login"))
+
+    #update users one time code
+    code = getCode()
+    user.updateCode(code)
+    sendCode(phoneNumber,code)
+    return render_template("getCode")
+
+
 @app.route("/test",methods=["GET","POST"])
 def test():
     sendCode(5039271017,123456)
