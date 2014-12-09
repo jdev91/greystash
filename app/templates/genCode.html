@@ -1,11 +1,22 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <script>
-        function checkCode(){
-            var val = window.prompt("Phone Code");
-            window.location.href = document.domain + "/genPass.html"
-        }
-    </script>
-document.onload() = checkCode;
+    <h2 class="Center">Login Here</h2>
+    <form action="" method="post" name="login" class="Center">
+        <p>
+            Please type code send to your phone<br>
+            {{ form.code(size=80) }}<br>
+        </p>
+        </p>
+            URL you are trying to log in to<br>
+            {{ form.url  }}</br>
+        </p>   
+        </p>
+            Typed password<br>
+            {{ form.typedPass  }}</br>
+        </p>   
+        <p>
+            <input type="submit" value="Sign In">
+        </p>
+    </form>
 {% endblock %}

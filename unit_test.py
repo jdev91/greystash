@@ -36,14 +36,9 @@ class TestApp(unittest.TestCase):
             retVal = c.post('/login',data=dict(
                 number="5039271017"
             ),follow_redirects=True)
-            self.assertTrue(session["USER"] != None)
-            print(str(retVal))
-            retVal = c.post('/logout')
-            print(str(retVal))
-            self.assertTrue(session["USER"] == None)
-
-    def test_send_msg(self):
-        sendCode(123456,5039271017)
+    def test_views_genCode(self):
+        with app.test_client() as c:
+            retVal = c.post("/genCode/5039271017")
 def rndString():
     return "".join(random.choice(string.ascii_uppercase + string.digits + string.ascii_lowercase) for i in range(12))
 

@@ -1,7 +1,7 @@
 import re
 from app import app
 from sendEmail import sendCode
-from forms import LoginForm
+from forms import LoginForm, GenPassForm
 from crypt import hashVal
 from user import newUser, getUser, getCode
 from flask.ext.login import current_user,login_user,logout_user,login_required
@@ -12,12 +12,6 @@ def index():
     """Landing page for home and return from other commands"""
     return render_template('index.html')
 
-@app.route("/logout",methods=["GET","POST"])
-def logout():
-    """ Removes phonenumber from cookie."""
-    session["USER"] = None
-    flash("Logout Succesful")
-    return redirect(url_for("index"))
 
 @app.route("/login",methods=["GET","POST"])
 def login():
@@ -27,9 +21,6 @@ def login():
     
     """
     form = LoginForm()
-    if "USER" in session.keys() and session["USER"] != None:
-        flash("User already logged in\n" + str(session["USER"]))
-        return redirect(url_for('index'))
     if request.method == "GET":
         return render_template("login.html",form=form)
     
@@ -39,7 +30,6 @@ def login():
         phoneNumer = int(phoneNumber)
         
         hashPhone = hashVal(phoneNumber)
-        session["USER"] = phoneNumber
         user = newUser(hashPhone)#none if user alreay exists
         note = "Successfully Loggedin."
         
@@ -48,25 +38,27 @@ def login():
         else:
             note = "New Account created for " + str(phoneNumber) + ".\n" + note
         flash(note)
-    return redirect(request.args.get("next") or url_for("index"))
+        return redirect(url_for("genCode",phoneNumber 
+            = str(phoneNumber), code = "NONE"))
+    return redirect(request.args.get("next") or url_for("login"))
 
-@app.route("/genCode",methods=["GET", "POST"])
-def getCode():
-    if not "USER" in session.keys() or session["USER"] == None:
-        return redirect(url_for("login"))
+@app.route("/genCode/<phoneNumber>/<code>",methods=["GET", "POST"])
+def genCode(phoneNumber,code):
+    user = getUser(phoneNumber)
+    form = GenPassForm(user = user)
+    if request.method == "GET" or code == "NONE":
+        #update users one time ddcode
+        code = getCode()
+        sendCode(phoneNumber,code)
+        return render_template("genCode.html",form=form)
     
-    #grab user info
-    phoneNumber = session["USER"]
-    hashPhone = hashVal(phoneNumber)
-    user = getUser(phoneNumber) 
-    if user == None:
-        return redirect(url_for("login"))
-
-    #update users one time code
-    code = getCode()
-    user.updateCode(code)
-    sendCode(phoneNumber,code)
-    return render_template("getCode")
+    if form.validate_on_submit():
+        #gen password
+        password = "Dummy"
+        flash("Password for " + form.url.data + " is " + password)
+    else:
+        flash("Wrong code. A new one is being sent")
+    return render_template("genCode.html")
 
 
 @app.route("/test",methods=["GET","POST"])

@@ -5,13 +5,12 @@ from flask.ext.mongoalchemy import MongoAlchemy
 
 app = Flask(__name__)
 app.config.update(
-    MAIL_SERVER = "smtp.gmail.com",
-    MAIL_USE_SSL = False,
-    MAIL_USE_TLS = False,
-    MAIL_Port = 465,
-    MAIL_USERNAME="greystash.devlin@gmail.com",
-    MAIL_PASSWORD="stupidpassword",
     DEBUG = True,
+    MAIL_SERVER='smtp.live.com',
+    MAIL_PORT=587,
+    MAIL_USE_TLS=True,
+    MAIL_USERNAME = 'greystash.devlin@hotmail.com',
+    MAIL_PASSWORD = 'Fpasswords',
     MONGOALCHEMY_DATABASE = "Users",
     SECRET_KEY = "kjlsfdjlksdfjlksdfjkfsdjlksdfjk"
 )
