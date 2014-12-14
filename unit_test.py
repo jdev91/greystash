@@ -31,14 +31,30 @@ class TestApp(unittest.TestCase):
         self.assertTrue(user != None)
         user = newUser(curTime)
         self.assertTrue(user == None)
+    def test_user_updateCode(self):
+        user = getUser(hashVal(5039271017))
+        code = user.updateCode()
+        self.assertTrue(code == user.oneTimeKey)
+    def test_user_checkCode(self):
+        user = getUser(hashVal("5039271017"))
+        code = user.updateCode()
+        self.assertTrue(user.checkCode(code))
+        self.assertFalse(user.checkCode(code))
+        self.assertFalse(user.checkCode(-1))
+    def test_get_user(self):
+        isUser = getUser(hashVal("5039271017"))
+        notUser = getUser(hashVal("99999999999999999999999999999999"))
+        self.assertTrue(isUser != None)
+        self.assertTrue(notUser == None)
     def test_views_login(self):
         with app.test_client() as c:
             retVal = c.post('/login',data=dict(
                 number="5039271017"
             ),follow_redirects=True)
     def test_views_genCode(self):
-        with app.test_client() as c:
-            retVal = c.post("/genCode/5039271017")
+        #with app.test_client() as c:
+           # retVal = c.post("/genCode/5039271017")
+        pass
 def rndString():
     return "".join(random.choice(string.ascii_uppercase + string.digits + string.ascii_lowercase) for i in range(12))
 

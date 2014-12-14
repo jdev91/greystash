@@ -8,14 +8,9 @@ class LoginForm(Form):
     def validate_on_submit(self):
         return True
 class GenPassForm(Form):
-    code = StringField("Code")
+    code = StringField("Phone number")
     url = StringField("Website URL")
     typedPass = PasswordField("Typed Password")
-    user = None
     def validate_on_submit(self):
-        if user == None:
-            return False
-        if user.oneTimeKey == code:
-            return True
-        return False
+        return True
 

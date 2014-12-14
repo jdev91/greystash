@@ -12,9 +12,17 @@ class User(db.Document):
     def __repr__(self):
         return '<User %r seed %r>' % (self.phoneNumber,self.rndSeed)
 
-    def updateCode(self, val):
-        self.OneTimeKey = val
+    def updateCode(self):
+        code = getCode()
+        self.oneTimeKey = code
         self.save()
+        return code
+    def checkCode(self,code):
+        if code == self.oneTimeKey and code != INVALID_KEY:
+            self.oneTimeKey = INVALID_KEY
+            self.save()
+            return True
+        return False
 
 def getUser(number):
     """ Find user in database
@@ -26,7 +34,7 @@ def getUser(number):
         User object or None
 
     """
-    return User.query.filter(User.phoneNumber == number).first()  
+    return User.query.filter(User.phoneNumber == str(number)).first()  
 
 def newUser(number):
     """ Create new users if does not already exist
