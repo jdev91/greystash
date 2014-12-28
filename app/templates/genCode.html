@@ -1,22 +1,21 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h2 class="Center">Login Here</h2>
+    <h2 class="Center">What Password Do You Want?</h2>
     <form action="" method="post" name="login" class="Center">
         <p>
             Please type code send to your phone<br>
-            {{ form.code(size=80) }}<br>
+            {{ form.code(size=30) }}<br>
         </p>
         </p>
             URL you are trying to log in to<br>
-            {{ form.url(size=40)  }}</br>
-        </p>   
-        </p>
-            Typed password<br>
-            {{ form.typedPass(size=40)  }}</br>
+            {{ form.url(size=30)  }}</br>
         </p>   
         <p>
-            <input type="submit" value="Sign In">
+            <input type="submit" value="Generate Pass">
+        </p>
+        <p>
+            <input type="submit" value="Next Password">
         </p>
     </form>
 {% endblock %}

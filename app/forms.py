@@ -10,7 +10,6 @@ class LoginForm(Form):
 class GenPassForm(Form):
     code = StringField("Phone number")
     url = StringField("Website URL")
-    typedPass = PasswordField("Typed Password")
     def validate_on_submit(self):
         return True
 

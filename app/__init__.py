@@ -10,8 +10,8 @@ app.config.update(
     MAIL_PORT=587,
     MAIL_USE_TLS=True,
     MAIL_USERNAME = 'greystash.devlin@hotmail.com',
-    MAIL_PASSWORD = 'Foobaryo',
-    MONGOALCHEMY_DATABASE = "Users",
+    MAIL_PASSWORD = 'FooBaryo',
+    MONGOALCHEMY_DATABASE = "Users2",
     SECRET_KEY = "kjlsfdjlksdfjlksdfjkfsdjlksdfjk"
 )
 

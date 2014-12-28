@@ -5,7 +5,7 @@ from forms import LoginForm, GenPassForm
 from crypt import hashVal
 from user import newUser, getUser, getCode
 from flask.ext.login import current_user,login_user,logout_user,login_required
-from flask import render_template, flash, url_for, request, g, redirect, session
+from flask import render_template, flash, url_for, request, g, redirect, session, jsonify
 
 @app.route("/")
 def index():
@@ -33,18 +33,23 @@ def login():
         user = newUser(hashPhone)#none if user alreay exists
         note = "Successfully Loggedin."
         
+        #user is trying to generate a password
         if user == None:
             user = getUser(hashPhone)
-        else:
-            note = "New Account created for " + str(phoneNumber) + ".\n" + note
+            flash(note)
+            return redirect(url_for("getCode", phoneNumber = str(phoneNumber)))
+        
+        #user is creating an account
+        note = "New Account created for " + str(phoneNumber) + ".\n" + note
         flash(note)
-        return redirect(url_for("getCode",phoneNumber 
-            = str(phoneNumber)))
     return redirect(request.args.get("next") or url_for("login"))
 
 @app.route("/genCode/<phoneNumber>/sendCode",methods=["GET", "POST"])
 def getCode(phoneNumber):
-    user = getUser(hashVal(phoneNumber))
+    phoneHash = hashVal(phoneNumber) 
+    user = newUser(phoneHash)#none if user alreay exists
+    if user == None:
+        user = getUser(phoneHash)
     code = user.updateCode()
     print("Sending code value: " + str(code))
     sendCode(phoneNumber,code)
@@ -57,17 +62,60 @@ def genCode(phoneNumber):
     form = GenPassForm(user = user)
     if request.method == "GET":
         return render_template("genCode.html",form=form)
-    
     if form.validate_on_submit():
         #gen password
         if not user.checkCode(int(form.code.data)):
             flash("One time code does not match. Please try again.")
             return redirect(url_for("genCode",phoneNumber = str(phoneNumber)))
-        password = "Dummy"
-        flash("Password for " + form.url.data + " is " + password)
-        return redirect(url_for("genCode",phoneNumber = str(phoneNumber)))
+        password = user.genPass(form.url.data,True)
+        flash("Password for " + form.url.data + " is " + str(password))
+    return redirect(url_for("login"))
 
+@app.route("/api/<phoneNumber>/<code>/<url>")
+def apiGenPass(phoneNumber, code, url):
+    user = getUser(hashVal(phoneNumber))
+    if not user or not user.checkCode(int(code)):
+        return jsonify({"msg" : "failed"})
+    return jsonify({"msg" : user.genPass(url,True)})
+#ndle cors requests
+@app.before_request
+def before_request():
+    g.user = current_user
+    if request.method == 'OPTIONS' and True:
+        resp = app.make_default_options_response()
+    
+        headers = None
+        if 'ACCESS_CONTROL_REQUEST_HEADERS' in request.headers:
+            headers = request.headers['ACCESS_CONTROL_REQUEST_HEADERS']
+        
+        h = resp.headers
+    
+        if 'ACCESS_CONTROL_REQUEST_HEADERS' in request.headers:
+            headers = request.headers['ACCESS_CONTROL_REQUEST_HEADERS']
+            
+        h = resp.headers
+        
+        h['Access-Control-Allow-Origin'] = request.headers['Origin']
+        h['Access-Control-Allow-Methods'] = request.headers['Access-Control-Req']
+        # Allow for 10 seconds
+        h['Access-Control-Max-Age'] = "10"
+        if headers is not None:
+            h['Access-Control-Allow-Headers'] = headers
 
-@app.route("/test",methods=["GET","POST"])
-def test():
-    sendCode(5039271017,123456)
+        return resp
+
+#add CORS headers
+@app.after_request
+def add_cors(resp):
+    """ Ensure all responses have the CORS headers. This ensures any failures are also accessible
+    by the client. """
+
+    resp.headers['Access-Control-Allow-Origin'] = request.headers.get('Origin','*')
+    resp.headers['Access-Control-Allow-Credentials'] = 'true'
+    resp.headers['Access-Control-Allow-Methods'] = 'POST, OPTIONS, GET'
+    resp.headers['Access-Control-Allow-Headers'] = request.headers.get( 
+    'Access-Control-Request-Headers', 'Authorization' )
+    # set low for debugging
+    if app.debug:
+        resp.headers['Access-Control-Max-Age'] = '1'
+    return resp

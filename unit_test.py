@@ -46,6 +46,19 @@ class TestApp(unittest.TestCase):
         notUser = getUser(hashVal("99999999999999999999999999999999"))
         self.assertTrue(isUser != None)
         self.assertTrue(notUser == None)
+    def test_getSalt(self):
+        isUser = getUser(hashVal("5039271017"))
+        curSalt = isUser.getSalt("facebook.com",True)
+        nextSalt = isUser.getSalt("facebook.com", False)
+        isUser.updateSalt("facebook.com")
+        newSalt = isUser.getSalt("facebook.com", False)
+        nextSalt2 =isUser.getSalt("facebook.com", True)
+        for salt in [curSalt,nextSalt,nextSalt2,newSalt]:
+            print("\tSalt: " + str(salt))
+        
+        self.assertFalse(curSalt == nextSalt)
+        self.assertTrue(nextSalt == nextSalt2)
+        self.assertTrue(newSalt != curSalt and newSalt != nextSalt2)
     def test_views_login(self):
         with app.test_client() as c:
             retVal = c.post('/login',data=dict(
@@ -55,6 +68,20 @@ class TestApp(unittest.TestCase):
         #with app.test_client() as c:
            # retVal = c.post("/genCode/5039271017")
         pass
+    def test_generatePassword(self):
+        uniqueID = rndString()
+        urls = ["https://facebook.com","facebook.com/","https://facebook.com/main/I/wonder/if./this/matters"]
+        password = generatePassword("facebook.com",uniqueID,"foo")
+        passwordFalse = generatePassword("facebook.com",uniqueID,"")
+        self.assertFalse(password == passwordFalse)
+
+        for url in urls:
+            passwordNewUrl = generatePassword(url, uniqueID,"foo")
+            self.assertTrue(password == passwordNewUrl)
+        for i in range(0,100):
+            password = generatePassword("foo.com", rndString(), "a")
+            print("RND password" +  password)
+            self.assertTrue(re.match(PASSWORD_RE, password) or password == None)
 def rndString():
     return "".join(random.choice(string.ascii_uppercase + string.digits + string.ascii_lowercase) for i in range(12))
 
