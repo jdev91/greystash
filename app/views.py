@@ -3,7 +3,7 @@ from app import app
 from sendEmail import sendCode
 from forms import LoginForm, GenPassForm
 from crypt import hashVal
-from user import newUser, getUser, getCode
+from user import newUser, getUser, getCode, createSalts, setSalts
 from flask.ext.login import current_user,login_user,logout_user,login_required
 from flask import render_template, flash, url_for, request, g, redirect, session, jsonify
 
@@ -50,6 +50,7 @@ def getCode(phoneNumber):
     user = newUser(phoneHash)#none if user alreay exists
     if user == None:
         user = getUser(phoneHash)
+    print(str(user))
     code = user.updateCode()
     print("Sending code value: " + str(code))
     sendCode(phoneNumber,code)
@@ -76,8 +77,37 @@ def apiGenPass(phoneNumber, code, url):
     user = getUser(hashVal(phoneNumber))
     if not user or not user.checkCode(int(code)):
         return jsonify({"msg" : "failed"})
+    createSalts(user, url)
     return jsonify({"msg" : user.genPass(url,True)})
-#ndle cors requests
+
+@app.route("/api/new/<phoneNumber>/<code>/<url>")
+def apiGenNewPass(phoneNumber, code, url):
+    user = getUser(hashVal(phoneNumber))
+    if not user or not user.checkCode(int(code)):
+        return jsonify({"msg" : "failed"})
+    createSalts(user, url)
+    return jsonify({"msg" : user.genPass(url,False)})
+
+@app.route("/api/update/<phoneNumber>/<url>/<code>")
+def apiUpdatePass(phoneNumber,url,code):
+    user = getUser(hashVal(phoneNumber))
+    if not user or not user.checkCode(int(code)):
+        return jsonify({"msg" : "failed"})
+    createSalts(user, url)
+    vals = user.updateSalt(url)
+    print("Update vals: " + str(vals))
+    setSalts(user,url,vals)
+    return jsonify({"msg" : "success"})
+
+@app.route("/api/isStale/<phoneNumber>/<url>")
+def apiIsStale(phoneNumber,url):
+    user = getUser(hashVal(phoneNumber))
+    if not user :
+        return jsonify({"msg" : "failed"})
+    createSalts(user, url)
+    return jsonify({"msg" : str(user.isStale(url))})
+
+#handle cors requests
 @app.before_request
 def before_request():
     g.user = current_user

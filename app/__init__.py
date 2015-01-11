@@ -10,9 +10,9 @@ app.config.update(
     MAIL_PORT=587,
     MAIL_USE_TLS=True,
     MAIL_USERNAME = 'greystash.devlin@hotmail.com',
-    MAIL_PASSWORD = 'FooBaryo',
-    MONGOALCHEMY_DATABASE = "Users2",
-    SECRET_KEY = "kjlsfdjlksdfjlksdfjkfsdjlksdfjk"
+    MAIL_PASSWORD = 'Tdpd8dBNsdiuy1dp',
+    MONGOALCHEMY_DATABASE = "Users9",
+    SECRET_KEY = "fjk)7h,>iqEdiuoasdkjnbkljhd88923)HI2Mmlk2oOAIHasdl//"
 )
 
 lm = LoginManager()

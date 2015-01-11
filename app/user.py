@@ -6,14 +6,15 @@ from crypt import generatePassword
 INVALID_KEY = -1
 CURRENT = 0
 NEXT = 1
+STALE = 2
 
 class User(db.Document):
     phoneNumber= db.StringField("User Phone Number")#hash(number)
     rndSeed = db.IntField()#random seed to gnerate passowrds
     oneTimeKey = db.IntField()#negative if not active
-    urlSalts = db.DictField(db.TupleField(db.IntField(), db.IntField()))#key url -> (currentSalt,NextSalt) 
+    urlSalts = db.DictField(db.TupleField(db.IntField(), db.IntField(),db.BoolField()))#key url -> (currentSalt,NextSalt) 
     def __repr__(self):
-        return '<User %r seed %r>' % (self.phoneNumber,self.rndSeed)
+        return '<User %r seed %r>\n\t %r' % (self.phoneNumber,self.rndSeed, self.urlSalts)
 
     def updateCode(self):
         code = getCode()
@@ -28,27 +29,43 @@ class User(db.Document):
         return False
     def getSalt(self, url, current = True):
         url = str(re.sub(r"[\.\$]","",url))
-        #new URL or poorly formatted tuple
-        if (not (url in self.urlSalts.keys())) or (len(self.urlSalts[url]) != 2):
-            print("Have to make new salt: " + url)
-            salt = getRandomSeed()
-            nextSalt = getRandomSeed()
-            self.urlSalts[url] = (salt, nextSalt)
-            self.save()
+        
         #figure out what salt we need
-        print(str(self.urlSalts))
+        print("Current salt info: " + str(self.urlSalts))
         index = NEXT
         if current:
             index = CURRENT
         return self.urlSalts[url][index]
     def updateSalt(self,url):
         url = re.sub(r"[\.\$]","",url)
-        self.urlSalts[url] = (self.urlSalts[url][NEXT],getRandomSeed())
-        self.save()
+        (cur, next, stale) = self.urlSalts[url]
+        return (next,getRandomSeed(),False)
+    def isStale(self,url):
+        url = re.sub(r"[\.\$]", "", url)
+        if url in self.urlSalts.keys():
+            return self.urlSalts[url][STALE]
+        return False
     def genPass(self,url,current = True):
         salt = self.getSalt(url, current)
+        
+        #update staleness
+        (cur, next, boolVal) = self.urlSalts[url]
+        self.urlSalts[url] = (cur, next, not current)
+        self.save()
         return generatePassword(url, self.rndSeed, salt)
 
+def setSalts(user, url, vals):
+    url = str(re.sub(r"[\.\$]", "", url))
+    user.urlSalts[url] = vals
+    user.save(True)
+def createSalts(user, url):
+    url = str(re.sub(r"[\.\$]", "", url))
+    if not url in user.urlSalts.keys():
+        print("Making new slat for: " + url)
+        salt = getRandomSeed()
+        nextSalt = getRandomSeed()
+        user.urlSalts[url] = (salt, nextSalt, False)
+        user.save(True)
 
 def getUser(number):
     """ Find user in database
@@ -74,7 +91,7 @@ def newUser(number):
     """
     if userExists(number):
         return None
-    user =  User(phoneNumber=number, rndSeed=getRandomSeed(), oneTimeKey=INVALID_KEY, urlSalts={})
+    user =  User(phoneNumber=number, rndSeed=getRandomSeed(), oneTimeKey=INVALID_KEY, urlSalts={"dummy" :(1,1,False)})
     user.save()
     return user
 

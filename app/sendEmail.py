@@ -2,7 +2,7 @@ import sys, traceback
 from app import *
 from flask.ext.mail import Mail, Message
 
-carierTypes = ["@txt.att.net"]
+carierTypes = ["@txt.att.net","@vtext.com"]
 carierTypes_full = ["@message.alltel.com", "@txt.att.net", "@myboostmobile.com",
         "@messaging.nextel", "@messaging.sprintpcs.com", "@tmomail.net",
         "@email.uscc.net", "@vtext.com", "@vmobl.com"]
