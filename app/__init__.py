@@ -11,7 +11,7 @@ app.config.update(
     MAIL_USE_TLS=True,
     MAIL_USERNAME = 'greystash.devlin@hotmail.com',
     MAIL_PASSWORD = 'Tdpd8dBNsdiuy1dp',
-    MONGOALCHEMY_DATABASE = "Users9",
+    MONGOALCHEMY_DATABASE = "Users10",
     SECRET_KEY = "fjk)7h,>iqEdiuoasdkjnbkljhd88923)HI2Mmlk2oOAIHasdl//"
 )
 

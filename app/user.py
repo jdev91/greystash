@@ -29,7 +29,13 @@ class User(db.Document):
         return False
     def getSalt(self, url, current = True):
         url = str(re.sub(r"[\.\$]","",url))
-        
+        if not url in self.urlSalts.keys():
+            print("Making new slat for: " + url)
+            salt = getRandomSeed()
+            nextSalt = getRandomSeed()
+            self.urlSalts[url] = (salt, nextSalt, False)
+            self.save()
+
         #figure out what salt we need
         print("Current salt info: " + str(self.urlSalts))
         index = NEXT
@@ -39,7 +45,8 @@ class User(db.Document):
     def updateSalt(self,url):
         url = re.sub(r"[\.\$]","",url)
         (cur, next, stale) = self.urlSalts[url]
-        return (next,getRandomSeed(),False)
+        self.urlSalts[url] = (next,getRandomSeed(),False)
+        self.save()
     def isStale(self,url):
         url = re.sub(r"[\.\$]", "", url)
         if url in self.urlSalts.keys():
@@ -53,19 +60,6 @@ class User(db.Document):
         self.urlSalts[url] = (cur, next, not current)
         self.save()
         return generatePassword(url, self.rndSeed, salt)
-
-def setSalts(user, url, vals):
-    url = str(re.sub(r"[\.\$]", "", url))
-    user.urlSalts[url] = vals
-    user.save(True)
-def createSalts(user, url):
-    url = str(re.sub(r"[\.\$]", "", url))
-    if not url in user.urlSalts.keys():
-        print("Making new slat for: " + url)
-        salt = getRandomSeed()
-        nextSalt = getRandomSeed()
-        user.urlSalts[url] = (salt, nextSalt, False)
-        user.save(True)
 
 def getUser(number):
     """ Find user in database
